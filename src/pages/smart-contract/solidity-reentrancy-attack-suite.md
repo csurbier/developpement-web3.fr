@@ -5,6 +5,7 @@ title: "Solidity: attaque par re-entrance la suite"
 description: "Suite du tutoriel solidity expliquant les attaques de re-entrance avec l'étude d'un cas concret."
 blogPost: "Attaque par 'Ré-entrance' (reentrancy)"
 image: false
+canonical: "https://www.developpement-web3.fr/smart-contract/solidity-reentrancy-attack-suite/"
 ---
 
 ## Réalisation d'une attaque par "reentrancy"
@@ -185,11 +186,13 @@ contract BankAccount is ReentrancyGuard {
 
 Il suffit de déclarer toutes les méthodes pour lesquelles on veut éviter la ré-entrance possible avec le mot clé: <b>nonReentrant</b>.
                              <br><br>Et voilà. 
-                             <br><br>J'espère que ce tutoriel vous a plus. Pour rappel, vous pouvez trouver le code source de cet article <a href="https://github.com/csurbier/tutoriels-developpement-web3" target="_blank">sur mon GitHub.</a>
+                             <br><br>J'espère que ce tutoriel vous a plu. Pour rappel, vous pouvez trouver le code source de cet article <a href="https://github.com/csurbier/tutoriels-developpement-web3" target="_blank">sur mon GitHub.</a>
                            
 
 
+Vous pouvez aussi soutenir ce site en envoyant de l'ETH ou du MATIC:
 
+<img style="width: 100px;" src="/img/qr-code.png">
 
 
 <style>

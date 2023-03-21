@@ -5,6 +5,7 @@ title: "Solidity: attaque par re-entrance"
 description: "Tutoriel solidity expliquant les attaques de re-entrance avec l'étude d'un cas concret."
 blogPost: "Attaque par 'Ré-entrance' (reentrancy)"
 image: true
+canonical: "https://www.developpement-web3.fr/smart-contract/solidity-reentrancy-attack/"
 ---
  ## Définition d'une attaque par "reentrancy"
   La Ré-entrance est lorsqu'une méthode est appelée de manière récursive. Si la récursivité n'est pas un problème en soi cela peut le devenir si le contrat contenant la
@@ -121,7 +122,7 @@ describe("ReentrancyAttack", function () {
                                 <br>En fait tant que l'on appelle ce contrat en tant que EOA (External owner account = signifie compte contrôlé par des clés privées soit un humain, plus d'infos <a href="https://ethereum.org/en/developers/docs/accounts/">ici</a>)
                                 il n'y a pas de souci.<br><br> Le problème se corse si c'est un autre smart contract qui appelle ce smart contract.
                                 <br><br>
-                                <a href="/smart-contract/solidity-reentrancy-attack-suite">Lire la suite</a>
+                                <a href="/smart-contract/solidity-reentrancy-attack-suite/">Lire la suite</a>
 
 
 <style>

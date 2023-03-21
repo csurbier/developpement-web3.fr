@@ -1,6 +1,6 @@
 ---
  
-const { title, description } = Astro.props;
+const { title, description,canonical } = Astro.props;
 ---
 <head>
     <meta charset="UTF-8">
@@ -18,6 +18,8 @@ const { title, description } = Astro.props;
     <link rel="sitemap" href="/sitemap-index.xml">
     <!-- Favicon -->
     <link rel="icon" href="/img/core-img/favicon.ico">
+    <link rel="canonical" href={canonical}>
+ 
  <!-- Google tag (gtag.js) -->
 <script async src="https://www.googletagmanager.com/gtag/js?id=G-XNLXBTQEWJ"></script>
 <script>
@@ -27,5 +29,5 @@ const { title, description } = Astro.props;
 
   gtag('config', 'G-XNLXBTQEWJ');
 </script>
-    
+  
 </head>

@@ -5,7 +5,7 @@ const { frontmatter } = Astro.props;
 ---
 <!DOCTYPE html>
 <html lang="fr">
-	<Header title={frontmatter.title} description={frontmatter.description}></Header>
+	<Header title={frontmatter.title} description={frontmatter.description} canonical={frontmatter.canonical}></Header>
 	<body >
 		 
 	   
@@ -41,17 +41,47 @@ const { frontmatter } = Astro.props;
                             <h2 class="w-text title wow fadeInUp" data-wow-delay="0.2s">{frontmatter.blogPost}</h2>
                             <ol class="breadcrumb justify-content-center wow fadeInUp" data-wow-delay="0.4s">
                                 <li class="breadcrumb-item"><a href="/">Accueil</a></li>
-                                <li class="breadcrumb-item"><a href="/smart-contract/smart-contract-avec-solidity">Smart
+                                <li class="breadcrumb-item"><a href="/smart-contract-avec-solidity/">Smart
                                         contract</a></li>
 
                             </ol>
                         </nav>
                     </div>
+                    <div class="col-12">
+                        <script is:inline type="text/javascript" 
+                        src="https://cdnjs.buymeacoffee.com/1.0.0/button.prod.min.js"
+                         data-name="bmc-button" data-slug="csurbier" 
+                         data-color="#5F7FFF" 
+                         data-emoji=""  data-font="Cookie" data-text="Buy me a coffee"
+                          data-outline-color="#000000" 
+                          data-font-color="#ffffff" 
+                          data-coffee-color="#FFDD00" ></script>
+                          <a href="https://www.buymeacryptobeer.com/ChristopheSurbier" target="_blank" ><img src="https://www.buymeacryptobeer.com/assets/images/logo/bigLogo.png" style="padding-top:10px;border-radius: 10px; height: 57px !important;width: 150px !important;" alt=""></img></a>
+                      </div>
+                      <div class="col-12">
+                        <a style="color:white!important;font-size: 14px;" href="mailto:csurbier@idevotion.fr" target="_blank">M'écrire, me signaler une erreur?</a>
+                      </div>
+                      <div>
+
+<!-- AddToAny BEGIN -->
+<div class="a2a_kit a2a_kit_size_32 a2a_default_style">
+    <a class="a2a_dd" href="https://www.addtoany.com/share"></a>
+    <a class="a2a_button_facebook"></a>
+    <a class="a2a_button_twitter"></a>
+    <a class="a2a_button_email"></a>
+    <a class="a2a_button_linkedin"></a>
+    </div>
+    <script>
+    var a2a_config = a2a_config || {};
+    a2a_config.locale = "fr";
+    </script>
+    <script async src="https://static.addtoany.com/menu/page.js"></script>
+    <!-- AddToAny END -->
+                      </div>
                 </div>
             </div>
         </div>
     </div>
-
       <!-- ##### Blog Area Start ##### -->
       <section class="blog-area section-padding-100-85">
         <div class="container">

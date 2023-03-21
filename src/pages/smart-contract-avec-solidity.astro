@@ -2,7 +2,9 @@
 import Layout from '../layouts/Layout.astro'; 
 ---
 
-<Layout title="Tutoriels développement smart contracts avec solidity et hardhat" description="Tutoriels sur le développement de smart contract en solidity avec hardhat sur blockchain Ethereum ou Polygon.">
+<Layout title="Tutoriels développement smart contracts avec solidity et hardhat" 
+description="Tutoriels sur le développement de smart contract en solidity avec hardhat sur blockchain Ethereum ou Polygon."
+canonical="https://www.developpement-web3.fr/smart-contract-avec-solidity/">
 	 
 	    <!-- Preloader -->
         <div id="preloader">
@@ -17,15 +19,7 @@ import Layout from '../layouts/Layout.astro';
                 <!-- Brand -->
                 <a class="navbar-brand" href="/">Accueil</a>
     
-                <!-- Toggler/collapsibe Button -->
-                <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#collapsibleNavbar">
-                    <span class="navbar-toggler-icon"></span>
-                </button>
-    
-                <!-- Navbar links -->
-                <div class="collapse navbar-collapse" id="collapsibleNavbar">
-                    
-                </div>
+              
             </div>
         </nav>
         <!-- ##### Header Area End ##### -->
@@ -55,20 +49,35 @@ import Layout from '../layouts/Layout.astro';
         <section class="Projects section-padding-100">
             <div class="container">
                
-                <div class="row">
-                    <div class="col-12 col-lg-6">
+                <div class="row" style="padding-top:40px;">
+                    <div class="col-12 col-lg-6" style="min-height: 270px;">
+                       
+                        <div class="project_single wow fadeInUp" data-wow-delay="0.2s">
+                            <div class="project_img">
+                                <img src="img/projects/1.jpg" class="img-responsive " alt="">
+                            </div>
+                            <div class="project_info">
+                                <a href="/smart-contract/nft-souscription/"><h4>Gérer des souscriptions avec des NFTs</h4></a>
+                                <p>16 Mars 2023</p>
+                                <a href="/smart-contract/nft-souscription/">Lire<span><i class="fa fa-arrow-right"></i></span></a>
+                            </div>
+                        </div>
+                    </div> 
+
+                    <div class="col-12 col-lg-6"  style="min-height: 270px;">
                         <!-- Content -->
                         <div class="project_single wow fadeInUp" data-wow-delay="0.2s">
                             <div class="project_img">
                                 <img src="img/projects/1.jpg" class="img-responsive " alt="">
                             </div>
                             <div class="project_info">
-                                <a href="/smart-contract/solidity-reentrancy-attack"><h4>Attaque par "Ré-entrance" (reentrancy)</h4></a>
+                                <a href="/smart-contract/solidity-reentrancy-attack/"><h4>Attaque par "Ré-entrance" (reentrancy)</h4></a>
                                 <p>7 Mars 2023</p>
-                                <a href="/smart-contract/solidity-reentrancy-attack">Lire<span><i class="fa fa-arrow-right"></i></span></a>
+                                <a href="/smart-contract/solidity-reentrancy-attack/">Lire<span><i class="fa fa-arrow-right"></i></span></a>
                             </div>
                         </div>
                     </div>
+                  
                     <!-- <div class="col-12 col-lg-6">
                         
                         <div class="project_single wow fadeInUp" data-wow-delay="0.3s">

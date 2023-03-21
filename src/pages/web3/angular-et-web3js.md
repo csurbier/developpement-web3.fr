@@ -5,6 +5,7 @@ title: "Angular et web3.js"
 description: "Tutoriel sur comment utiliser la librairie web3.js avec Angular."
 blogPost: "Initiation utilisation de web3.js avec Angular"
 image: true
+canonical: "https://www.developpement-web3.fr/web3/angular-et-web3js/"
 ---
 
 ## Installation
@@ -220,6 +221,10 @@ ce qui correspond à la blockchain Ethereum. Vous pouvez retrouver les identifia
 Voilà pour notre courte introduction au développement web3 avec Angular. 
 
 Dans notre prochain tutoriel, nous continuerons à explorer l'utilisation de la librairie **web3.js** et verrons comment détecter le changement d'adresse de compte Metamask, de blockchain et aussi comment demander l'ajout d'une blockchain dans la configuration Metamask.
+
+Vous pouvez aussi soutenir ce site en envoyant de l'ETH ou du MATIC:
+
+<img style="width: 100px;" src="/img/qr-code.png">
 
 <style>
     p { color: white;!important }
